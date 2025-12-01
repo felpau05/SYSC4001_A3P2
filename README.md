@@ -1,110 +1,67 @@
-\# SYSC 4001 – Assignment 3, Part 2  
-
-\*\*Concurrent Processes in Unix: TA Marking System\*\*  
-
+# Assignment 3 Part 2
+Concurrent Processes in Unix – TA Marking System  
 Student IDs: 101308579, 101299663  
-
-Repository: `SYSC4001\_A3P2`
-
-
+Repository: `SYSC4001_A3P2`
 
 ---
 
+## Description
 
+This project implements **Assignment 3 – Part 2** for SYSC 4001.  
+It simulates multiple TAs marking exams concurrently under Unix, using:
 
-\## 1. Overview
+- **Part 2.a** – processes + shared memory (no semaphores, intentional race conditions)
+- **Part 2.b** – processes + shared memory + System V semaphores (proper critical-section handling)
 
-
-
-This repository implements \*\*Part 2\*\* of the assignment:
-
-
-
-\- \*\*Part 2.a\*\* – Concurrent TA marking using \*\*processes and shared memory only\*\* (no semaphores).  
-
-\- \*\*Part 2.b\*\* – Same marking system, but using \*\*processes, shared memory, and System V semaphores\*\* to enforce proper critical-section behaviour.
-
-
-
-The system simulates several TAs grading a sequence of exams using a common rubric stored in shared memory. Exam data and rubric data are shared between all TA processes; the student number `9999` is used as a sentinel to signal that no more real exams remain, and all TAs should terminate.
-
-
+Exams are stored in text files, a shared rubric is kept in shared memory, and the student number `9999` is used as a sentinel to signal the end of marking.
 
 ---
 
+## Features
 
-
-\## 2. Repository contents
-
-
-
-Root:
-
-
-
-\- `ta\_marking\_a\_101308579\_101299663.cpp`  
-
-&nbsp; Part 2.a implementation (shared memory only, no semaphores).
-
-
-
-\- `ta\_marking\_b\_101308579\_101299663.cpp`  
-
-&nbsp; Part 2.b implementation (shared memory + semaphores).
-
-
-
-\- `build.sh`  
-
-&nbsp; Convenience script to compile both programs.
-
-
-
-\- `rubric.txt`  
-
-&nbsp; Initial rubric file (5 lines, one per question).
-
-
-
-\- `exams/`  
-
-&nbsp; Directory containing all exam files used as input.
-
-
-
-\- `reportPartC.pdf`  
-
-&nbsp; Short report for Part 2.c (deadlock / livelock / execution order discussion).
-
-
-
-(Additional temporary or log files are not required for submission.)
-
-
+- Multiple TA processes (`num_TAs ≥ 2`)
+- Shared rubric in shared memory  
+- Shared “current exam” state in shared memory
+- Automatic progression through a sequence of exam files
+- Sentinel student **9999** to terminate all TAs
+- Detailed console logging:
+  - rubric corrections
+  - marking start/finish per question
+  - loading of the next exam
+  - TA termination on sentinel
 
 ---
 
+## File List
 
+**Source code**
 
-\## 3. Build instructions
+- `ta_marking_a_101308579_101299663.cpp`  
+  Part 2.a – shared memory only, **no semaphores**.
 
+- `ta_marking_b_101308579_101299663.cpp`  
+  Part 2.b – shared memory + **System V semaphores**.
 
+**Support files**
 
-These programs are intended to run on \*\*Linux\*\* (or WSL) with a C++17 compiler that supports System V IPC (shared memory and semaphores).
+- `build.sh` – shell script to compile both programs.  
+- `rubric.txt` – initial rubric (5 lines, one per question).  
+- `exams/` – directory containing all exam input files.  
+- `reportPartC.pdf` – short report for Part 2.c (deadlock / livelock / execution order).
 
+---
 
+## Assumptions
 
-\### 3.1. Build using `build.sh` (recommended)
+- The programs are run on **Linux** or **WSL** with a C++17 compiler and System V IPC support.
+- All paths are resolved relative to the **repository root**:
+  - `rubric.txt` in the root directory.
+  - `exams/` subfolder containing all exam files.
+- Exam files are named:
 
-
-
-From the repository root:
-
-
-
-```bash
-
-./build.sh
-
-
-
+  ```text
+  exam_0001.txt
+  exam_0002.txt
+  ...
+  exam_0019.txt
+  exam_9999.txt
